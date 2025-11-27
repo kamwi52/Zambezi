@@ -5,7 +5,7 @@ export interface Subject {
   name: string;
   icon: string; // Lucide icon name
   color: string;
-  topics: string[];
+  topicsByGrade: Record<number, string[]>;
 }
 
 export interface UserProgress {
@@ -35,4 +35,33 @@ export interface QuizResult {
   total: number;
   subjectId: string;
   date: Date;
+}
+
+export interface Flashcard {
+  front: string;
+  back: string;
+}
+
+export interface SavedMaterial {
+  id: string;
+  type: 'quiz' | 'note' | 'flashcard' | 'pdf';
+  subjectId: string;
+  subjectName: string;
+  topic: string;
+  grade: number;
+  title: string;
+  content: any; // QuizQuestion[] | string | Flashcard[] | string (base64 pdf)
+  timestamp: number;
+}
+
+export interface User {
+  phoneNumber: string;
+  hasPaid: boolean;
+  subscriptionDate?: number;
+  grade?: GradeLevel;
+  
+  // Profile Settings
+  name?: string;
+  nickname?: string;
+  profileSetupComplete: boolean;
 }

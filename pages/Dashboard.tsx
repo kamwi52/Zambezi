@@ -1,15 +1,16 @@
 import React from 'react';
 import { UserProgress } from '../types';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
-import { Flame, Trophy, Target } from 'lucide-react';
+import { Flame, Trophy, Target, Settings, GraduationCap } from 'lucide-react';
 import { ZAMBIAN_SYLLABUS_SUBJECTS } from '../constants';
 
 interface DashboardProps {
   progress: UserProgress;
   onNavigate: (view: string) => void;
+  userName?: string;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ progress, onNavigate }) => {
+const Dashboard: React.FC<DashboardProps> = ({ progress, onNavigate, userName }) => {
   const chartData = ZAMBIAN_SYLLABUS_SUBJECTS.map(subject => ({
     name: subject.name.split(' ')[0], // Short name
     score: progress.subjectMastery[subject.id] || 0,
@@ -27,16 +28,31 @@ const Dashboard: React.FC<DashboardProps> = ({ progress, onNavigate }) => {
     return '#8884d8';
   };
 
+  const handleSwitchGrade = () => {
+    const user = JSON.parse(localStorage.getItem('zambezi_user') || '{}');
+    if (user) {
+        // We now reset profileSetupComplete as well to trigger the wizard if they want to do a full re-setup
+        // Or strictly speaking just the grade. Let's just reset the grade logic by triggering the wizard again.
+        user.profileSetupComplete = false;
+        // Pre-fill existing data in the form is handled in ProfileSetup init state
+        localStorage.setItem('zambezi_user', JSON.stringify(user));
+        window.location.reload();
+    }
+  };
+
   return (
     <div className="p-4 md:p-8 space-y-6 pb-24 md:pb-8">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Welcome back!</h1>
-          <p className="text-gray-500">Grade {progress.grade} Student</p>
+          <h1 className="text-2xl font-bold text-gray-800">Welcome, {userName || 'Student'}!</h1>
+          <div className="flex items-center gap-2 mt-1">
+             <span className="text-gray-500 text-sm">Grade {progress.grade} Student</span>
+             <button onClick={handleSwitchGrade} className="text-[10px] bg-gray-100 px-2 py-0.5 rounded border border-gray-200 text-gray-600 font-medium">Edit Profile</button>
+          </div>
         </div>
-        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-xl">
-          👨🏾‍🎓
+        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-700">
+          <GraduationCap size={20} />
         </div>
       </div>
 

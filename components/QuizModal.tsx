@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
 import { QuizQuestion } from '../types';
-import { CheckCircle, XCircle, ChevronRight, RefreshCw, X } from 'lucide-react';
+import { CheckCircle, XCircle, ChevronRight, RefreshCw, X, Download, Check } from 'lucide-react';
 
 interface QuizModalProps {
   questions: QuizQuestion[];
   subjectName: string;
   onClose: () => void;
   onComplete: (score: number) => void;
+  onSave?: () => void;
+  isSaved?: boolean;
 }
 
-const QuizModal: React.FC<QuizModalProps> = ({ questions, subjectName, onClose, onComplete }) => {
+const QuizModal: React.FC<QuizModalProps> = ({ questions, subjectName, onClose, onComplete, onSave, isSaved = false }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [hasSaved, setHasSaved] = useState(isSaved);
 
   const handleOptionSelect = (index: number) => {
     if (isSubmitted) return;
@@ -40,6 +43,21 @@ const QuizModal: React.FC<QuizModalProps> = ({ questions, subjectName, onClose, 
     }
   };
 
+  const handleSave = () => {
+    if (onSave) {
+      onSave();
+      setHasSaved(true);
+    }
+  };
+
+  const handleRetry = () => {
+    setCurrentIndex(0);
+    setSelectedOption(null);
+    setScore(0);
+    setShowResult(false);
+    setIsSubmitted(false);
+  };
+
   if (showResult) {
     const percentage = Math.round((score / questions.length) * 100);
     return (
@@ -58,15 +76,21 @@ const QuizModal: React.FC<QuizModalProps> = ({ questions, subjectName, onClose, 
           </div>
           <h2 className="text-2xl font-bold mb-2">{percentage >= 70 ? "Great Job!" : "Keep Practicing!"}</h2>
           <p className="text-gray-500 mb-6">You scored {score} out of {questions.length} in {subjectName}.</p>
-          <div className="flex gap-3 justify-center">
+          <div className="flex gap-2 justify-center flex-wrap">
+            <button 
+              onClick={handleRetry}
+              className="px-5 py-2 bg-orange-100 text-orange-700 rounded-lg font-medium hover:bg-orange-200 flex items-center gap-2"
+            >
+              <RefreshCw size={18} /> Retry
+            </button>
             <button 
               onClick={onClose}
-              className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200"
+              className="px-5 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200"
             >
               Close
             </button>
             <button 
-              onClick={onClose} // Simplified reset logic by just closing for now
+              onClick={onClose} 
               className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
             >
               Finish
@@ -88,9 +112,21 @@ const QuizModal: React.FC<QuizModalProps> = ({ questions, subjectName, onClose, 
             <span className="text-xs font-bold text-green-600 uppercase tracking-wide">{subjectName} Quiz</span>
             <div className="text-gray-400 text-xs">Question {currentIndex + 1} of {questions.length}</div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
-            <X size={20} className="text-gray-500" />
-          </button>
+          <div className="flex items-center gap-2">
+            {onSave && (
+              <button 
+                onClick={handleSave} 
+                disabled={hasSaved}
+                className={`p-2 rounded-full transition-colors ${hasSaved ? 'text-green-600 bg-green-50' : 'text-gray-500 hover:bg-gray-100'}`}
+                title={hasSaved ? "Saved" : "Save for Offline"}
+              >
+                {hasSaved ? <Check size={20} /> : <Download size={20} />}
+              </button>
+            )}
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
+              <X size={20} className="text-gray-500" />
+            </button>
+          </div>
         </div>
 
         {/* Content */}

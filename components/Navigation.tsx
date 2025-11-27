@@ -1,17 +1,18 @@
 import React from 'react';
-import { Home, BookOpen, MessageCircle, BarChart2 } from 'lucide-react';
+import { Home, BookOpen, MessageCircle, Download, LogOut } from 'lucide-react';
 
 interface NavigationProps {
   currentView: string;
   onNavigate: (view: string) => void;
+  onLogout: () => void;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate }) => {
+const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate, onLogout }) => {
   const navItems = [
     { id: 'dashboard', label: 'Home', icon: Home },
     { id: 'subjects', label: 'Subjects', icon: BookOpen },
     { id: 'tutor', label: 'AI Tutor', icon: MessageCircle },
-    { id: 'progress', label: 'Progress', icon: BarChart2 },
+    { id: 'downloads', label: 'Downloads', icon: Download },
   ];
 
   return (
@@ -40,6 +41,15 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate }) => {
             </button>
           ))}
         </nav>
+        <div className="p-4 border-t">
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-3 w-full p-3 rounded-xl text-red-500 hover:bg-red-50 transition-all font-medium"
+            >
+                <LogOut size={20} />
+                Logout
+            </button>
+        </div>
       </div>
 
       {/* Mobile Bottom Navigation */}
@@ -57,6 +67,13 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate }) => {
               <span className="text-[10px] font-medium">{item.label}</span>
             </button>
           ))}
+          <button
+              onClick={onLogout}
+              className="flex flex-col items-center justify-center w-full h-full space-y-1 text-red-400"
+            >
+              <LogOut size={20} />
+              <span className="text-[10px] font-medium">Exit</span>
+          </button>
         </div>
       </div>
     </>
